@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nie mów Yyy</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -13,6 +17,24 @@
             min-height: 100vh;
             margin: 0;
             background-color: #f0f2f5;
+            padding: 20px;
+        }
+
+        .main-wrapper {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            max-width: 800px;
+            width: 100%;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        @media (max-width: 650px) {
+            .main-wrapper {
+                flex-direction: column;
+                align-items: center;
+            }
         }
 
         .container {
@@ -21,25 +43,112 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             text-align: center;
-            width: 320px;
+            width: 340px;
+            flex-shrink: 0;
+        }
+
+        .scoreboard-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 300px;
+            flex-shrink: 0;
         }
 
         .hidden {
             display: none !important;
         }
 
-        /* Sekcja słów */
+        h2, h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+
+        /* Ekran konfiguracyjny */
+        .mode-selection {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            background-color: #e0e0e0;
+            color: #333;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .mode-btn.active {
+            background-color: #e8f4fd;
+            border-color: #3498db;
+            color: #3498db;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .btn-add {
+            background-color: #2ecc71;
+            color: white;
+            padding: 10px 15px;
+        }
+
+        .player-list-setup {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+            max-height: 150px;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .player-list-setup li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+
+        .btn-remove {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+
+        /* Sekcja słów i stopera */
         .words-container {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: bold;
             color: #2c3e50;
             margin: 20px 0;
             min-height: 40px;
         }
 
-        /* Stoper / Odliczanie */
         .timer-container {
-            font-size: 20px;
+            font-size: 18px;
             margin: 15px 0;
             color: #555;
         }
@@ -65,53 +174,143 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+            width: 100%;
         }
 
         .btn-start {
             background-color: #2ecc71;
             color: white;
+            width: 100%;
         }
-        .btn-start:hover { background-color: #27ae60; }
 
         .btn-restart {
             background-color: #3498db;
             color: white;
         }
-        .btn-restart:hover { background-color: #2980b9; }
 
         .btn-end {
             background-color: #e74c3c;
             color: white;
         }
-        .btn-end:hover { background-color: #c0392b; }
+
+        /* Tabelka wyników po boku */
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .score-name {
+            font-weight: bold;
+            color: #333;
+            max-width: 120px;
+            word-wrap: break-word;
+            text-align: left;
+        }
+
+        .score-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .score-val {
+            font-size: 18px;
+            font-weight: bold;
+            min-width: 25px;
+            text-align: center;
+        }
+
+        .btn-score {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 18px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-plus { background-color: #2ecc71; color: white; }
+        .btn-minus { background-color: #e74c3c; color: white; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- Przycisk START -->
-        <button id="start-btn" class="btn-start" onclick="startProcess()">START</button>
-
-        <!-- Główna zawartość gry -->
-        <div id="game-area" class="hidden">
-            <div id="words" class="words-container"></div>
+    <div class="main-wrapper">
+        <!-- Główny kontener gry -->
+        <div class="container">
             
-            <div class="timer-container">
-                <span id="timer-label">Zapoznaj się ze słowami:</span>
-                <div id="timer" class="timer-number">3</div>
+            <!-- EKRAN 1: Ustawienia gry -->
+            <div id="setup-screen">
+                <h2>Ustawienia Gry</h2>
+                
+                <div class="mode-selection">
+                    <button id="mode-team-btn" class="mode-btn active" onclick="setGameMode('team')">Drużynowa</button>
+                    <button id="mode-ind-btn" class="mode-btn" onclick="setGameMode('individual')">Indywidualna</button>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="player-input" placeholder="Nazwa drużyny..." onkeydown="if(event.key==='Enter') addParticipant()">
+                    <button class="btn-add" onclick="addParticipant()">+</button>
+                </div>
+
+                <ul id="setup-participant-list" class="player-list-setup"></ul>
+
+                <button class="btn-primary" onclick="confirmSetup()">Dalej</button>
             </div>
 
-            <!-- Przyciski nawigacyjne -->
-            <div class="btn-list">
-                <button class="btn-restart" onclick="startProcess()">RESTART</button>
-                <button class="btn-end" onclick="endGame()">KONIEC</button>
+            <!-- EKRAN 2: Przycisk START -->
+            <div id="start-screen" class="hidden">
+                <h2>Gotowi?</h2>
+                <button class="btn-start" onclick="startProcess()">START</button>
             </div>
+
+            <!-- EKRAN 3: Aktywna gra -->
+            <div id="game-area" class="hidden">
+                <div id="words" class="words-container"></div>
+                
+                <div class="timer-container">
+                    <span id="timer-label">Zapoznaj się ze słowami:</span>
+                    <div id="timer" class="timer-number">3</div>
+                </div>
+
+                <div class="btn-list">
+                    <button class="btn-restart" onclick="startProcess()">RESTART</button>
+                    <button class="btn-end" onclick="endGame()">ZAKOŃCZ GRĘ</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Panel punktacji (po boku) -->
+        <div id="scoreboard-panel" class="scoreboard-container hidden">
+            <h3>Punktacja</h3>
+            <div id="scoreboard-list"></div>
         </div>
     </div>
 
     <script>
-        // System synth/odwarzania dźwięków przez Web Audio API
+        // Stan aplikacji
+        let gameMode = 'team'; // 'team' lub 'individual'
+        let participants = []; // { name: string, score: number }
+        let countdownInterval = null;
+
+        // Web Audio API
         let audioCtx = null;
 
         function getAudioContext() {
@@ -124,14 +323,13 @@
             return audioCtx;
         }
 
-        // Dźwięk pikania (3, 2, 1)
         function playBeep() {
             const ctx = getAudioContext();
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
 
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(880, ctx.currentTime); // Wysokie A (880Hz)
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
             gain.gain.setValueAtTime(0.1, ctx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
 
@@ -142,13 +340,8 @@
             osc.stop(ctx.currentTime + 0.15);
         }
 
-        
-
-        // Dźwięk końcowego dzwonka / gongu
         function playBell() {
             const ctx = getAudioContext();
-            
-            // Dwa połączone tony tworzące przyjemne brzmienie dzwonka
             [523.25, 659.25, 783.99].forEach((freq) => {
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
@@ -182,94 +375,88 @@
             "Zatoka", "Kanał", "Port", "Lotnisko", "Dworzec", "Przystanek", "Skrzyżowanie", "Chodnik", "Autostrada", "Tunel",
             "Wiadukt", "Rondo", "Parking", "Garaż", "Piwnica", "Strych", "Korytarz", "Pokój", "Kuchnia", "Łazienka",
             "Biuro", "Magazyn", "Fabryka", "Kopalnia", "Huta", "Warsztat", "Budowa", "Dźwig", "Koparka", "Traktor",
-            "Przyczepa", "Ciężarówka", "Taksówka", "Tramwaj", "Metro", "Rower", "Hulajnoga", "Motocykl", "Kask", "Ochroniarz",
-            "Kamizelka", "Mundur", "Odznaka", "Pistolet", "Kajdanki", "Syrena", "Alarm", "Czujnik", "Kamera", "Film",
-            "Teatr", "Scena", "Kurtyna", "Koncert", "Muzyka", "Piosenka", "Melodia", "Rytm", "Taniec", "Sport",
-            "Mecz", "Bramka", "Punkty", "Wynik", "Puchar", "Medal", "Podium", "Trener", "Stadion", "Boisko",
-            "Bieg", "Skok", "Rzut", "Szachy", "Karta", "Kostka", "Plansza", "Zabawka", "Sukces", "Porażka",
-            "Walka", "Wojna", "Pokój", "Umowa", "Podpis", "Pieczątka", "Dokument", "Dług", "Kredyt", "Bank",
-            "Bankomat", "Podatek", "Cena", "Koszt", "Zysk", "Strata", "Firma", "Szef", "Pracownik", "Praca",
-            "Urlop", "Wakacje", "Podróż", "Przygoda", "Wycieczka", "Namiot", "Ognisko", "Śpiwór", "Kompas", "Siekiera",
-            "Łopata", "Grabie", "Kosiarka", "Wąż", "Doniczka", "Nasiono", "Korzeń", "Gałąź", "Liść", "Pień",
-            "Kora", "Grzyb", "Owad", "Pająk", "Pszczoła", "Motyl", "Mrówka", "Komar", "Mucha", "Ślimak",
-            "Żaba", "Jaszczurka", "Sokowirówka", "Młynek", "Opiekacz", "Toster", "Mikser", "Chłodziarka", "Klimatyzator", "Grzejnik",
-            "Termos", "Pojemnik", "Fartuch", "Rękawica", "Deska", "Tarka", "Dorsz", "Łosoś", "Śledź", "Makrela",
-            "Krewetka", "Homar", "Krab", "Ośmiornica", "Delfin", "Wieloryb", "Rekin", "Żółw", "Krokodyl", "Kameleon",
-            "Iguana", "Struś", "Pingwin", "Sokół", "Jastrząb", "Sowa", "Kruk", "Sroka", "Wróbel", "Bocian",
-            "Czapla", "Łabędź", "Mewa", "Nietoperz", "Wiewiórka", "Jeż", "Bóbr", "Bizon", "Żubr", "Lama",
-            "Alpaka", "Wielbłąd", "Gepard", "Pantera", "Jaguar", "Puma", "Hiena", "Szakal", "Suseł", "Kret",
-            "Dziki", "Sarna", "Jeleń", "Łoś", "Kozica", "Muflon", "Borsuk", "Wydra", "Kuna", "Łasica",
-            "Marmur", "Granit", "Bazalt", "Gips", "Kreda", "Bursztyn", "Szafir", "Rubin", "Szmaragd", "Perła",
-            "Koral", "Mosiądz", "Miedź", "Cyna", "Ołów", "Cynk", "Aluminium", "Stal", "Żelazo", "Srebro",
-            "Złoto", "Platyna", "Ametyst", "Topaz", "Jaspis", "Agat", "Kwarc", "Krzemień", "Płótno", "Aksamit",
-            "Jedwab", "Wełna", "Bawełna", "Len", "Skóra", "Zamsz", "Guma", "Plastik", "Szkło", "Porcelana",
-            "Ceramika", "Gliniany", "Parkiet", "Panele", "Kafelki", "Rynna", "Gzyms", "Rawa", "Parkan",
-            "Furtka", "Szklarnia", "Altana", "Huśtawka", "Piaskownica", "Hamak", "Tarasy", "Weranda", "Ganek", "Schody",
-            "Poręcz", "Winda", "Półpiętro", "Szatnia", "Portiernia", "Recepcja", "Korytarz", "Gabinety", "Poczekalnia",
-            "Sala", "Hala", "Magazyny", "Boksy", "Chłodnia", "Spichlerz", "Stodoła", "Chlew", "Stajnia", "Kurnik",
-            "Gołębnik", "Pasieka", "Ul", "Młyn", "Tartak", "Cegielnia", "Elektrownia", "Ciepłownia", "Wodociąg", "Kanalizacja",
-            "Śmietnik", "Kontener", "Prasa", "Waga", "Miernik", "Skalpel", "Pęseta", "Maska", "Gogle", "Ochraniacze",
-            "Nauszniki", "Kombinezon", "Szelki", "Lina", "Karabinek", "Uprząż", "Magnezja", "Maty",
-            "Rolki", "Deskorolka", "Skuter", "Kwadrat", "Trójkąt", "Koło", "Romb", "Trapez", "Sześcian",
-            "Kulisty", "Stożek", "Walec", "Piramida", "Kula", "Owal", "Łuk", "Kąt", "Prosta", "Odcinek",
-            "Punkt", "Promień", "Średnica", "Obwód", "Pole", "Objętość", "Masa", "Długość", "Szerokość",
-            "Wysokość", "Głębokość", "Dystans", "Prędkość", "Czas", "Godzina", "Minuta", "Sekunda", "Miesiąc", "Tydzień",
-            "Kwartał", "Stulecie", "Wiosna", "Lato", "Jesień", "Zima", "Styczeń", "Luty", "Marzec", "Kwiecień",
-            "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień", "Poniedziałek", "Wtorek",
-            "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela", "Poranek", "Południe", "Popołudnie", "Wieczór",
-            "Świt", "Zmierzch", "Wschód", "Zachód", "Północ", "Kompas", "Mapa", "Plan", "Szkic",
-            "Mikroskop", "Teleskop", "Soczewka", "Pryzmat", "Okular", "Manometr", "Barometr", "Żyroskop", "Generator", "Transformator",
-            "Reaktor", "Turbina", "Procesor", "Algorytm", "Serwer", "Baza", "Pamięć", "Dysk", "Piksel", "Format",
-            "System", "Sieć", "Interfejs", "Protokół", "Szyfr", "Hasło", "Dostęp", "Licencja", "Patent", "Projekt",
-            "Schemat", "Wykres", "Tabela", "Statystyka", "Analiza", "Synteza", "Hipoteza", "Teoria", "Eksperyment", "Reakcja",
-            "Roztwór", "Osad", "Pierwiastek", "Atom", "Cząsteczka", "Proton", "Elektron", "Neutron", "Grawitacja", "Promieniowanie",
-            "Fala", "Częstotliwość", "Amplituda", "Napięcie", "Natężenie", "Opór", "Magnetyzm", "Indukcja", "Przewodnik", "Izolator",
-            "Stop", "Minerał", "Kryształ", "Diament", "Skamielina", "Ewolucja", "Organizm", "Komórka", "Tkanka", "Organ",
-            "Gen", "DNA", "Wirus", "Bakteria", "Antybiotyk", "Szczepionka", "Diagnoza", "Objaw", "Terapia", "Chirurgia",
-            "Anestezja", "Rehabilitacja", "Profilaktyka", "Epidemia", "Kwarantanna", "Higiena", "Ekologia", "Klimat", "Atmosfera", "Biosfera",
-            "Zasób", "Energia", "Odpad", "Recykling", "Emisja", "Smog", "Zagrożenie", "Ryzyko", "Katastrofa", "Ewakuacja",
-            "Schron", "Ratunek", "Przetrwanie", "Strategia", "Taktyka", "Konflikt", "Negocjacje", "Kompromis", "Sojusz", "Traktat",
-            "Dyplomacja", "Polityka", "Rząd", "Parlament", "Konstytucja", "Ustawa", "Przepis", "Paragraf", "Prawo", "Sprawiedliwość",
-            "Wyrok", "Kary", "Grzywna", "Więzienie", "Proces", "Dowód", "Alibi", "Motyw", "Śledztwo", "Inspekcja",
-            "Kontrola", "Audyt", "Budżet", "Finanse", "Inwestycja", "Giełda", "Akcja", "Obligacja", "Waluta", "Inflacja",
-            "Kryzys", "Kapitał", "Majątek", "Własność", "Spadek", "Testament", "Podatek", "Cło", "Handlarz", "Eksport",
-            "Import", "Towar", "Dystrybucja", "Logistyka", "Transport", "Magazynowanie", "Zapas", "Dostawa", "Zamówienie", "Klient",
-            "Konsument", "Reklama", "Marka", "Rynek", "Popyt", "Podaż", "Konkurencja", "Monopol", "Rozwój", "Postęp",
-            "Innowacja", "Technologia", "Przemysł", "Produkcja", "Wydajność", "Jakość", "Norma", "Certyfikat", "Standard", "Instrukcja",
-            "Procedura", "Metoda", "Technika", "Zasada", "Reguła", "Pozycja", "Rola", "Funkcja", "Zadanie", "Cel",
-            "Intencja", "Motywacja", "Ambicja", "Prestiż", "Reputacja", "Wpływ", "Władza", "Autorytet", "Dominacja", "Wolność",
-            "Niepodległość", "Prawda", "Fikcja", "Iluzja", "Mit", "Legenda", "Tradycja", "Obyczaj", "Kultura", "Sztuka",
-            "Architektura", "Rzeźba", "Literatura", "Poezja", "Proza", "Dramat", "Krytyka", "Recenzja", "Styl", "Trend",
-            "Moda", "Estetyka", "Harmonia", "Symfonia", "Operetka", "Galeria", "Muzeum", "Wystawa", "Eksponat", "Kolekcja",
-            "Zabytek", "Ruina", "Wykopalisko", "Archeologia", "Historia", "Epoka", "Era", "Wiek", "Dekada", "Pokolenie",
-            "Przodkowie", "Potomkowie", "Dziedzictwo", "Tożsamość", "Narodowość", "Katalizator", "Emulsja", "Enzym", "Hormon", "Metabolizm",
-            "Glukoza", "Białko", "Tłuszcz", "Węglowodan", "Witaminy", "Minerały", "Insektycyd", "Pestycyd", "Hermetyzacja", "Sublimacja",
-            "Kondensacja", "Krystalizacja", "Filtracja", "Destylacja", "Ekstrakcja", "Erozja", "Tektonika", "Magma", "Lawa", "Sejsmologia",
-            "Morfologia", "Anatomia", "Fizjologia", "Patologia", "Genetyka", "Biochemia", "Biofizyka", "Biotechnologia", "Ekosystem", "Siedlisko",
-            "Populacja", "Bioróżnorodność", "Sukcesja", "Symbioza", "Pasożytnictwo", "Drapieżnictwo", "Komensalizm", "Biomasa", "Fotorecepcja", "Synapsa",
-            "Neuron", "Kora", "Cerebellum", "Impuls", "Odruch", "Percepcja", "Kognitywna", "Świadomość", "Podświadomość", "Instynkt", "Fobia",
-            "Nerwica", "Psychoza", "Depresja", "Stres", "Adaptacja", "Kompresja", "Dekompresja", "Przyspieszenie", "Pęd",
-            "Bezwładność", "Tarcie", "Ciśnienie", "Wypór", "Spójność", "Lepkość", "Absorpcja", "Adsorpcja",
-            "Dyfuzja", "Osmoza", "Rozszerzalność", "Przewodność", "Pojemność", "Indukcyjność", "Rezystancja", "Impedancja", "Potencjał", "Prąd",
-            "Zwarcie", "Przeciążenie", "Kondensator", "Tranzystor", "Dioda", "Opornik", "Dławik", "Bezpiecznik", "Stycznik", "Przekaźnik",
-            "Falownik", "Prostownik", "Akumulator", "Fotoradar", "Lidar", "Odpylacz", "Kolektor", "Fotowoltaika", "Inwerter",
-            "Kocioł", "Skraplacz", "Parownik", "Sprężarka", "Zawór", "Siłownik", "Przekładnia", "Sprzęgło", "Wał",
-            "Łożysko", "Prowadnica", "Tłok", "Cylinder", "Głowica", "Rura", "Uszczelka", "Zawieszenie",
-            "Amortyzator", "Wahacz", "Maniok", "Zwrotnica", "Mechanizm", "Przenośnik", "Reduktor", "Prądnica", "Alternator",
-            "Starter", "Rozdzielnica", "Rozdzielnia", "Podstacja", "Światłowód", "Kabel", "Rdzeń", "Oplot", "Ekranowanie",
-            "Modulacja", "Demodulacja", "Sygnał", "Pasmo", "Szum", "Zakłócenie", "Wzmocnienie", "Tłumienie", "Nadajnik", "Odbiornik", "Repeater",
-            "Przełącznik", "Router", "Mostek", "Bramka", "Zapora", "Pakiet", "Nagłówek", "Bufor", "Kolejka", "Stos",
-            "Wskaźnik", "Zmienna", "Stała", "Instrukcja", "Pętla", "Warunek", "Funkcja", "Moduł", "Biblioteka", "Skrypt",
-            "Kompilator", "Asembler", "Kod", "Wyjątek", "Błąd", "Awarie", "Usterka", "Naprawa", "Konserwacja", "Przegląd",
-            "Regeneracja", "Atest", "Homologacja", "Weryfikacja", "Walidacja", "Kwalifikacja", "Sprawdzian", "Próba", "Test", "Pomiary",
-            "Kalibracja", "Wzorzec", "Tolerancja", "Odchylenie", "Rozrzut", "Średnia", "Mediana", "Wariancja", "Korelacja", "Regresja",
-            "Próbka", "Sondaż", "Ankieta", "Kwestionariusz", "Wywiad", "Obserwacja", "Metodologia", "Dysertacja", "Monografia", "Publikacja",
-            "Artykuł", "Referat", "Prezentacja", "Seminarium", "Sympozjum", "Kongres", "Konferencja", "Panel", "Debata", "Dyskutant",
-            "Prelegent", "Audytor", "Recenzent", "Promotor", "Kandydat", "Dziekan", "Rektor", "Katedra", "Wydział", "Instytut"
+            "Przyczepa", "Ciężarówka", "Taksówka", "Tramwaj", "Metro", "Rower", "Hulajnoga", "Motocykl", "Kask", "Ochroniarz"
         ];
 
-        let countdownInterval = null;
+        // Obsługa konfiguracji
+        function setGameMode(mode) {
+            gameMode = mode;
+            document.getElementById('mode-team-btn').classList.toggle('active', mode === 'team');
+            document.getElementById('mode-ind-btn').classList.toggle('active', mode === 'individual');
+            
+            const input = document.getElementById('player-input');
+            input.placeholder = mode === 'team' ? "Nazwa drużyny..." : "Imię gracza...";
+        }
 
+        function addParticipant() {
+            const input = document.getElementById('player-input');
+            const name = input.value.trim();
+            
+            if (name) {
+                participants.push({ name: name, score: 0 });
+                input.value = '';
+                renderSetupList();
+            }
+        }
+
+        function removeParticipant(index) {
+            participants.splice(index, 1);
+            renderSetupList();
+        }
+
+        function renderSetupList() {
+            const listEl = document.getElementById('setup-participant-list');
+            listEl.innerHTML = '';
+            
+            participants.forEach((p, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>${p.name}</span>
+                    <button class="btn-remove" onclick="removeParticipant(${index})">&times;</button>
+                `;
+                listEl.appendChild(li);
+            });
+        }
+
+        function confirmSetup() {
+            if (participants.length === 0) {
+                alert(gameMode === 'team' ? "Dodaj przynajmniej jedną drużynę!" : "Dodaj przynajmniej jednego gracza!");
+                return;
+            }
+
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+            document.getElementById('scoreboard-panel').classList.remove('hidden');
+            
+            renderScoreboard();
+        }
+
+        // Obsługa Punktacji
+        function updateScore(index, delta) {
+            participants[index].score += delta;
+            renderScoreboard();
+        }
+
+        function renderScoreboard() {
+            const listEl = document.getElementById('scoreboard-list');
+            listEl.innerHTML = '';
+
+            participants.forEach((p, index) => {
+                const item = document.createElement('div');
+                item.className = 'score-item';
+                item.innerHTML = `
+                    <span class="score-name">${p.name}</span>
+                    <div class="score-controls">
+                        <button class="btn-score btn-minus" onclick="updateScore(${index}, -1)">-</button>
+                        <span class="score-val">${p.score}</span>
+                        <button class="btn-score btn-plus" onclick="updateScore(${index}, 1)">+</button>
+                    </div>
+                `;
+                listEl.appendChild(item);
+            });
+        }
+
+        // Logika Gry
         function getRandomWords() {
             const shuffled = [...wordList].sort(() => 0.5 - Math.random());
             return `${shuffled[0]} - ${shuffled[1]}`;
@@ -278,7 +465,7 @@
         function startProcess() {
             clearInterval(countdownInterval);
 
-            document.getElementById('start-btn').classList.add('hidden');
+            document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('game-area').classList.remove('hidden');
 
             document.getElementById('words').textContent = getRandomWords();
@@ -290,7 +477,6 @@
             labelEl.textContent = "Zapoznaj się ze słowami:";
             timerEl.textContent = prepareTime;
             
-            // Dźwięk na starcie odliczania (3)
             playBeep();
 
             countdownInterval = setInterval(() => {
@@ -298,10 +484,10 @@
                 timerEl.textContent = prepareTime;
 
                 if (prepareTime > 0) {
-                    playBeep(); // Dźwięk przy 2 i 1
+                    playBeep();
                 } else {
                     clearInterval(countdownInterval);
-                    startMainTimer(); // Przejście do głównego czasu
+                    startMainTimer();
                 }
             }, 1000);
         }
@@ -313,19 +499,16 @@
 
             labelEl.textContent = "Czas gry:";
             timerEl.textContent = mainTime;
-            playTick();
 
             countdownInterval = setInterval(() => {
                 mainTime--;
                 timerEl.textContent = mainTime;
 
-                if (mainTime > 0) {
-                    playTick(); // Tykanie przy każdej sekundzie
-                } else {
+                if (mainTime <= 0) {
                     clearInterval(countdownInterval);
                     labelEl.textContent = "Czas minął!";
                     timerEl.textContent = "STOP";
-                    playBell(); // Dzwonek na koniec
+                    playBell();
                 }
             }, 1000);
         }
@@ -333,9 +516,13 @@
         function endGame() {
             clearInterval(countdownInterval);
             document.getElementById('game-area').classList.add('hidden');
-            document.getElementById('start-btn').classList.remove('hidden');
+            document.getElementById('scoreboard-panel').classList.add('hidden');
+            document.getElementById('setup-screen').classList.remove('hidden');
+            
+            // Reset stanu
+            participants = [];
+            renderSetupList();
         }
     </script>
-
 </body>
 </html>
