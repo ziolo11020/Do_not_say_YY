@@ -43,7 +43,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             text-align: center;
-            width: 340px;
+            width: 360px;
             flex-shrink: 0;
         }
 
@@ -60,16 +60,57 @@
             display: none !important;
         }
 
+        h1 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #e74c3c;
+            font-size: 28px;
+        }
+
         h2, h3 {
             margin-top: 0;
             color: #2c3e50;
+        }
+
+        /* Sekcja z informacjami / zasadami */
+        .info-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+            border-radius: 0 8px 8px 0;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .info-box p {
+            margin: 0 0 10px 0;
+        }
+
+        .info-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-box ul {
+            margin: 5px 0 10px 0;
+            padding-left: 20px;
+        }
+
+        .info-box .good-luck {
+            font-weight: bold;
+            color: #2ecc71;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 16px;
         }
 
         /* Ekran konfiguracyjny */
         .mode-selection {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .mode-btn {
@@ -255,9 +296,24 @@
         <!-- Główny kontener gry -->
         <div class="container">
             
-            <!-- EKRAN 1: Ustawienia gry -->
+            <!-- EKRAN 1: Ustawienia gry i Zasady -->
             <div id="setup-screen">
-                <h2>Ustawienia Gry</h2>
+                <h1>Nie mów „Yyy...”</h1>
+                
+                <div class="info-box">
+                    <p>Dostaniesz zestaw 2 słów. Wytłumacz je osobom z Twojej drużyny lub następnej osobie w kolejce.</p>
+                    <p>Za każdy przerywnik:</p>
+                    <ul>
+                        <li>„Yyy...”</li>
+                        <li>„Eee...”</li>
+                        <li>„Ooo...”</li>
+                        <li>„Aaaa...” itp.</li>
+                    </ul>
+                    <p>lub przeciąganie wyrazu, Twój przeciwnik lub przeciwna drużyna dostaje punkt!</p>
+                    <div class="good-luck">Powodzenia!</div>
+                </div>
+
+                <h3>Ustawienia Gry</h3>
                 
                 <div class="mode-selection">
                     <button id="mode-team-btn" class="mode-btn active" onclick="setGameMode('team')">Drużynowa</button>
